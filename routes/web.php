@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Middleware\Authlogin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PengaduanController;
+use App\Http\Controllers\MasyarakatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,16 +18,29 @@ use App\Http\Controllers\AuthController;
 */
 
 Route::get('/', function () {
-    return view('dashboard');
-});
+    return view('layout');
+})->middleware('auth');
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return view('layout')->middleware('auth');
 });
+
+Route::resource('masyarakat', PengaduanController::class)->middleware('Authlogin');
+
+Route::get('/myinvoice', function () {
+    return view('masyarakat.myinvoice');
+})->middleware('Authlogin');
 
 Route::group(['prefix'=>'auth'], function ($route) {
     Route::get('/register', [AuthController::class, 'viewregister']);
     Route::get('/login', [AuthController::class, 'viewlogin'])->name('login');
     Route::post('/postregister', [AuthController::class, 'register'])->name('post.register');
     Route::post('/postlogin', [AuthController::class, 'login'])->name('post.login');
+});
+
+Route::group(['prefix'=>'authmasyarakat'], function ($route) {
+    Route::get('/register', [MasyarakatController::class, 'viewregister']);
+    Route::get('/login', [MasyarakatController::class, 'viewlogin'])->name('loginmasyarakat');
+    Route::post('/postregister', [MasyarakatController::class, 'register'])->name('post.registermasyarakat');
+    Route::post('/postlogin', [MasyarakatController::class, 'login'])->name('post.loginmasyarakat');
 });
